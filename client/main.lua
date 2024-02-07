@@ -198,6 +198,12 @@ local function AddArmorBuff(time, value)
     end
 end exports('AddArmorBuff', AddArmorBuff)
 
+RegisterCommand("stambuff", function()
+    AddHealthBuff(50000, math.random(1,5))
+    Wait(1000)
+    AddArmorBuff(50000, math.random(1,5))
+end)
+
 --- Method to add stress buff to player
 --- @param time  - Time in ms the stress buff will be active
 --- @param value - The amount of stress the player will lose every 5 seconds
@@ -215,3 +221,26 @@ local function AddStressBuff(time, value)
         end)
     end
 end exports('AddStressBuff', AddStressBuff)
+
+--- Method to add stamina buff to player
+--- @param time  - Time in ms the health buff will be active
+--- @param value - The amount of speed boost the player will recieve
+local hasStaminaBuffActive = false
+local function StaminaBuffEffect(time, value)
+    AddBuff("stamina", time)
+    if not hasStaminaBuffActive then 
+        hasStaminaBuffActive = true
+        CreateThread(function()
+            SetRunSprintMultiplierForPlayer(PlayerId(), value)
+            while exports['ps-buffs']:HasBuff("stamina") do
+                Wait(500)
+                SetPlayerStamina(PlayerId(), GetPlayerStamina(PlayerId()) + math.random(1,10))
+            end
+            SetRunSprintMultiplierForPlayer(PlayerId(), 1.0)
+            hasStaminaBuffActive = false
+        end)
+    end
+end exports('StaminaBuffEffect', StaminaBuffEffect)
+
+
+exports["ps-buffs"]:StaminaBuffEffect(time in ms, buff amoount)
